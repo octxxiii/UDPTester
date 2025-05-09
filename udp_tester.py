@@ -445,8 +445,8 @@ class UDPTester:
             send_sock.sendto(data, (ip, port))
             
             # 로그 출력
-            send_time = time.strftime('%H:%M:%S.%f')[:-3]
-            self.log_message(f"[전송] {send_time} → {ip}:{port} (크기: {len(data)}바이트)")
+            current_time = datetime.now().strftime('%H:%M:%S.%f')[:-3]
+            self.log_message(f"[전송] {current_time} → {ip}:{port} (크기: {len(data)}바이트)")
             self.log_hexdump(data, is_outgoing=True)
             
             send_sock.close()
@@ -576,14 +576,14 @@ class UDPTester:
         while self.is_listening:
             try:
                 data, addr = self.udp_socket.recvfrom(4096)
-                recv_time = time.strftime('%H:%M:%S.%f')[:-3]
+                current_time = datetime.now().strftime('%H:%M:%S.%f')[:-3]
                 
                 # 상세 로그 메시지 추가
                 src_ip = addr[0]
                 src_port = addr[1]
                 data_size = len(data)
                 
-                self.log_message(f"[수신] {recv_time} ← {src_ip}:{src_port} (크기: {data_size}바이트)")
+                self.log_message(f"[수신] {current_time} ← {src_ip}:{src_port} (크기: {data_size}바이트)")
                 
                 # 데이터 표시 (16진수 및 ASCII)
                 self.log_hexdump(data, is_outgoing=False)
@@ -592,7 +592,8 @@ class UDPTester:
                 if echo_mode and self.is_listening:
                     try:
                         self.udp_socket.sendto(data, addr)
-                        self.log_message(f"[에코] {time.strftime('%H:%M:%S.%f')[:-3]} → {src_ip}:{src_port} (크기: {data_size}바이트)")
+                        echo_time = datetime.now().strftime('%H:%M:%S.%f')[:-3]
+                        self.log_message(f"[에코] {echo_time} → {src_ip}:{src_port} (크기: {data_size}바이트)")
                         self.log_hexdump(data, is_outgoing=True)
                     except Exception as e:
                         self.log_message(f"에코 응답 실패: {e}")
@@ -611,7 +612,7 @@ class UDPTester:
     def log_message(self, message):
         def update_log():
             self.log_area.config(state=tk.NORMAL)
-            self.log_area.insert(tk.END, f"[{time.strftime('%H:%M:%S')}] {message}\n")
+            self.log_area.insert(tk.END, f"[{datetime.now().strftime('%H:%M:%S')}] {message}\n")
             if self.auto_scroll:
                 self.log_area.see(tk.END)
             self.log_area.config(state=tk.DISABLED)
